@@ -22,10 +22,10 @@ import ofs_asp_pkg::*;
     `ifdef INCLUDE_USM_SUPPORT
         , ofs_plat_avalon_mem_if.to_sink kernel_svm
     `endif
-    `ifdef INCLUDE_IO_PIPES
+    // `ifdef INCLUDE_IO_PIPES
         ,asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
         asp_avst_if.sink       udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]
-    `endif
+    // `endif
 );
 
 kernel_mem_intf mem_avmm_bridge [ASP_LOCALMEM_NUM_CHANNELS-1:0] ();
@@ -253,7 +253,7 @@ kernel_system kernel_system_inst (
         .kernel_mem_byteenable      (svm_avmm_kernelsystem.byteenable)
     `endif //INCLUDE_USM_SUPPORT
     
-    `ifdef INCLUDE_IO_PIPES
+    // `ifdef INCLUDE_IO_PIPES
         `ifdef ASP_ENABLE_IOPIPE_0
             ,.udp_out_valid        (udp_avst_from_kernel[0].valid),
             .udp_out_data          (udp_avst_from_kernel[0].data),
@@ -382,7 +382,7 @@ kernel_system kernel_system_inst (
             .udp_in_15_data           (udp_avst_to_kernel[15].data),
             .udp_in_15_ready          (udp_avst_to_kernel[15].ready)
         `endif //ASP_ENABLE_IOPIPE_15
-    `endif
+    // `endif
 );
 
 `ifdef INCLUDE_USM_SUPPORT

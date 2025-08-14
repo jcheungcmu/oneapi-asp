@@ -23,6 +23,9 @@ import ofs_asp_pkg::*;
         ofs_plat_hssi_channel_if hssi_pipes[IO_PIPES_NUM_CHAN],
     `endif
 
+    asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
+    asp_avst_if.sink      udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0],
+
     // clocks and reset
     input logic pClk,                      //Primary interface clock
     input logic pClk_reset,                // ACTIVE HIGH Soft Reset
@@ -127,9 +130,9 @@ host_mem_if_vtp host_mem_if_vtp_inst (
 );
 
 `ifdef INCLUDE_IO_PIPES
-//UDP/HSSI offload engine
-    asp_avst_if udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0]();
-    asp_avst_if udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]();
+// // UDP/HSSI offload engine
+//     asp_avst_if udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0]();
+//     asp_avst_if udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]();
     ofs_plat_avalon_mem_if #(
         `OFS_PLAT_AVALON_MEM_IF_REPLICATE_PARAMS(mmio64_if)
     ) uoe_csr_avmm();
@@ -184,10 +187,10 @@ kernel_wrapper kernel_wrapper_inst (
         , .kernel_svm (kernel_svm_kclk)
     `endif
 
-    `ifdef INCLUDE_IO_PIPES
+    // `ifdef INCLUDE_IO_PIPES
         ,.udp_avst_from_kernel,
          .udp_avst_to_kernel
-    `endif
+    // `endif
 );
 
 endmodule : afu
