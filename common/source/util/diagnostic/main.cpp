@@ -82,6 +82,7 @@ bool check_results(unsigned int *buf, unsigned int *output, unsigned n) {
 #define MMD_STRING_RETURN_SIZE 1024
 
 int scan_devices(const char *device_name) {
+  // printf("invoked scan_devices\n");
   static char vendor_name[MMD_STRING_RETURN_SIZE];
   aocl_mmd_get_offline_info(AOCL_MMD_VENDOR_NAME, sizeof(vendor_name),
                             vendor_name, NULL);
@@ -110,6 +111,7 @@ int scan_devices(const char *device_name) {
     if (device_name != NULL && strcmp(dev_name, device_name) != 0)
       continue;
 
+   
     handle = aocl_mmd_open(dev_name);
 
     // print out the first row of the table when needed
@@ -122,6 +124,7 @@ int scan_devices(const char *device_name) {
     }
 
     num_active_boards++;
+    // printf("incremented num_active_boards: %d\n", num_active_boards);
 
     // when handle < -1 a DCP device exists but is not configured with OpenCL
     // ASP
@@ -152,6 +155,7 @@ int scan_devices(const char *device_name) {
                     << std::left << std::setw(38) << " "
                     << "Need to follow instructions to bind vfio-pci driver to PR slot function\n";
     }
+
 
     // skip to next dev_name
     if (handle < 0) {
@@ -199,6 +203,7 @@ int scan_devices(const char *device_name) {
     }
   }
 
+  // printf("num_active_boards: %d\n", num_active_boards);
   if (num_active_boards > 0) {
     if (device_name == NULL) {
       o_list_stream
@@ -261,8 +266,10 @@ int main(int argc, char *argv[]) {
   }
 
   // If probing all devices we're done here
-  if (probe)
+  if (probe) {
+    printf("quit after probing all devices\n");
     return 0;
+  }
 
   // Full diagnosis of a particular device begins here
 

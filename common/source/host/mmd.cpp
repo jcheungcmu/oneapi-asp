@@ -168,6 +168,7 @@ int DeviceMapManager::get_or_create_device(const char *board_name, int *handle,
   }
   if (id_to_handle_map->count(obj_id) == 0) {
     try {
+      // printf("CREATING NEW DEVICE %s WITH OBJ_ID %ld\n", board_name, obj_id);
       _device = new Device(obj_id);
       _handle = _device->get_mmd_handle();
       id_to_handle_map->insert({obj_id, _handle});
@@ -449,6 +450,7 @@ fpga_result get_dfl_tokens(std::vector<fpga_token> &tokens)
 
   tokens.resize(num_matches);
 
+  // printf("GETTING DFL TOKENS\n");
   res = fpgaEnumerate(&filter, 1, tokens.data(), tokens.size(), &num_matches);
   if (res != FPGA_OK) {
     LOG_ERR("Error enumerating: %s\n", fpgaErrStr(res));
@@ -474,6 +476,7 @@ fpga_result build_board_names(std::vector<fpga_token> &toks, std::string &boards
   fpga_properties props = nullptr;
 
   for (auto &t : toks) {
+    // printf("GETTING TOKEN PROPERTIES\n");
     fpgaGetProperties(t, &props);
     fpga_objtype type;
 
@@ -483,8 +486,20 @@ fpga_result build_board_names(std::vector<fpga_token> &toks, std::string &boards
       uint64_t obj_id = 0;
       fpgaPropertiesGetObjectID(props, &obj_id);
 
+      fpga_token dummy_tok = nullptr;
+      // printf("OPENING TOK\n");
+      fpgaOpen(t, &dummy_tok, 0);
+      fpgaClose(dummy_tok);
+      
+
+      // printf("GETTING PARENT\n");
+      fpgaPropertiesGetParent(props, &dummy_tok);
+      fpgaOpen(dummy_tok, &dummy_tok, 0);
+      fpgaClose(dummy_tok);
+      // printf("**************\n");
       boards.append(Device::get_board_name(ASP_NAME, obj_id));
       boards.append(";");
+
     }
 
     fpgaDestroyProperties(&props);
@@ -552,17 +567,22 @@ static bool get_offline_board_names(std::string &boards, bool asp_only = true) {
       fpgaPropertiesGetDevice(dfl_props, &device);
 
       fpga_token fme_tok = nullptr;
+      // printf("GETTING FME_TOK\n");
       res = fpgaPropertiesGetParent(dfl_props, &fme_tok);
       if (res != FPGA_OK) {
         fpgaDestroyProperties(&dfl_props);
         continue;      
       }
 
+      // const size_t filters = 8;
+      // fpga_properties filter[filters] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+
       const size_t filters = 4;
       fpga_properties filter[filters] = { nullptr, nullptr, nullptr, nullptr };
 
       //const size_t filters = 2; 
       //fpga_properties filter[filters] = { nullptr, nullptr};
+
       fpgaGetProperties(nullptr, &filter[0]);
       fpgaPropertiesSetObjectType(filter[0], FPGA_ACCELERATOR);
       fpgaPropertiesSetSegment(filter[0], segment);
@@ -598,6 +618,51 @@ static bool get_offline_board_names(std::string &boards, bool asp_only = true) {
       fpgaPropertiesSetGUID(filter[3], svm_guid);
       fpgaPropertiesSetInterface(filter[3], FPGA_IFC_SIM_VFIO);
 
+      // fpgaGetProperties(nullptr, &filter[4]);
+      // fpgaPropertiesSetObjectType(filter[4], FPGA_ACCELERATOR);
+      // fpgaPropertiesSetSegment(filter[4], segment);
+      // fpgaPropertiesSetBus(filter[4], bus);
+      // fpgaPropertiesSetDevice(filter[4], device);
+      // fpgaPropertiesSetGUID(filter[4], pci_guid);
+      // fpgaPropertiesSetInterface(filter[4], FPGA_IFC_VFIO);
+      // //fpgaPropertiesSetInterface(filter[4], FPGA_IFC_SIM_VFIO);
+
+      // fpgaGetProperties(nullptr, &filter[5]);
+      // fpgaPropertiesSetObjectType(filter[5], FPGA_ACCELERATOR);
+      // fpgaPropertiesSetSegment(filter[5], segment);
+      // fpgaPropertiesSetBus(filter[5], bus);
+      // fpgaPropertiesSetDevice(filter[5], device);
+      // fpgaPropertiesSetGUID(filter[5], pci_guid);
+      // fpgaPropertiesSetInterface(filter[5], FPGA_IFC_SIM_VFIO);
+
+
+      // fpgaGetProperties(nullptr, &filter[6]);
+      // fpgaPropertiesSetObjectType(filter[6], FPGA_ACCELERATOR);
+      // fpgaPropertiesSetSegment(filter[6], segment);
+      // fpgaPropertiesSetBus(filter[6], bus);
+      // fpgaPropertiesSetDevice(filter[6], device);
+      // fpgaPropertiesSetGUID(filter[6], svm_guid);
+      // fpgaPropertiesSetInterface(filter[6], FPGA_IFC_VFIO);
+      // //fpgaPropertiesSetInterface(filter[6], FPGA_IFC_SIM_VFIO);
+
+      // fpgaGetProperties(nullptr, &filter[7]);
+      // fpgaPropertiesSetObjectType(filter[7], FPGA_ACCELERATOR);
+      // fpgaPropertiesSetSegment(filter[7], segment);
+      // fpgaPropertiesSetBus(filter[7], bus);
+      // fpgaPropertiesSetDevice(filter[7], device);
+      // fpgaPropertiesSetGUID(filter[7], svm_guid);
+      // fpgaPropertiesSetInterface(filter[7], FPGA_IFC_SIM_VFIO);
+
+      // fpgaPropertiesSetFunction(filter[0], 1);
+      // fpgaPropertiesSetFunction(filter[1], 1);
+      // fpgaPropertiesSetFunction(filter[2], 1);
+      // fpgaPropertiesSetFunction(filter[3], 1);
+
+      // fpgaPropertiesSetFunction(filter[4], 2);
+      // fpgaPropertiesSetFunction(filter[5], 2);
+      // fpgaPropertiesSetFunction(filter[6], 2);
+      // fpgaPropertiesSetFunction(filter[7], 2);
+
       uint32_t num_tokens = 0;
 
       res = fpgaEnumerate(filter, filters, nullptr, 0, &num_tokens);
@@ -610,12 +675,18 @@ static bool get_offline_board_names(std::string &boards, bool asp_only = true) {
       fpgaDestroyProperties(&filter[1]);
       fpgaDestroyProperties(&filter[2]);
       fpgaDestroyProperties(&filter[3]);
+      // fpgaDestroyProperties(&filter[4]);
+      // fpgaDestroyProperties(&filter[5]);
+      // fpgaDestroyProperties(&filter[6]);
+      // fpgaDestroyProperties(&filter[7]);
     }
 
+    // printf("asp_only=TRUE build_board_names %ld\n", asp_tokens.size());
     build_board_names(asp_tokens, boards);
 
   } else {
 
+    // printf("asp_only=false build_board_names %ld\n", dfl_tokens.size());
     build_board_names(dfl_tokens, boards);
 
   }

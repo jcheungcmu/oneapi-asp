@@ -18,6 +18,8 @@ echo "run.sh ASP_BUILD_PWD is $ASP_BUILD_PWD"
 Q_REVISION="ofs_top"
 echo "Q_REVISION is $Q_REVISION"
 Q_PR_PARTITION_NAME="green_region"
+# Q_PR_PARTITION_NAME="green_region_2"
+
 echo "Q_PR_PARTITION_NAME is $Q_PR_PARTITION_NAME"
 
 # set ASP flow
@@ -117,8 +119,11 @@ echo "Starting: quartus_sh --flow compile $Q_REVISION -c $ASP_FLOW"
 quartus_sh --flow compile $Q_REVISION -c $ASP_FLOW
 
 rm -rf fpga.bin
+# rm -rf fpga_2.bin
 
 generated_gbs="${ASP_FLOW}"."${Q_PR_PARTITION_NAME}".gbs
+# generated_gbs_2="${ASP_FLOW}"."${Q_PR_PARTITION_NAME_2}".gbs
+
 if [ ! -f ./output_files/"${generated_gbs}" ]; then
     echo "run.sh ERROR: can't find ./output_files/${generated_gbs}"
     exit 1
@@ -127,6 +132,10 @@ fi
 gzip -9c ./output_files/$generated_gbs > $generated_gbs.gz
 aocl binedit fpga.bin create
 aocl binedit fpga.bin add .acl.gbs.gz "./${generated_gbs}.gz"
+
+# gzip -9c ./output_files/$generated_gbs_2 > $generated_gbs_2.gz
+# aocl binedit fpga_2.bin create
+# aocl binedit fpga_2.bin add .acl.gbs.gz "./${generated_gbs_2}.gz"
 
 echo "run.sh: done zipping up the gbs into gbs.gz, and creating fpga.bin"
 
@@ -152,6 +161,8 @@ quartus_sh -t scripts/gen-asp-quartus-report.tcl ofs_top "${ASP_FLOW}"
 
 #copy fpga.bin to parent directory so oneAPI flow can find it
 cp fpga.bin $RELATIVE_KERNEL_BUILD_PATH_TO_HERE/
+# cp fpga_2.bin $RELATIVE_KERNEL_BUILD_PATH_TO_HERE/
+
 cp acl_quartus_report.txt $RELATIVE_KERNEL_BUILD_PATH_TO_HERE/
 
 echo ""

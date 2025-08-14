@@ -22,6 +22,8 @@ int find_fpga(struct find_fpga_target target, fpga_token *fpga);
 
 int program_gbs_bitstream(fpga_token fpga, uint8_t *gbs_data, size_t gbs_len);
 
+int jason_program_gbs_bitstream(int _slot_num, fpga_token fpga, uint8_t *gbs_data, size_t gbs_len);
+
 #ifdef __cplusplus
 }
 #endif

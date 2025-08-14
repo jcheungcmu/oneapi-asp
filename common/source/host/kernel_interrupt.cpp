@@ -272,7 +272,7 @@ int KernelInterrupt::yield_is_enabled() {
  */
 int KernelInterrupt::yield() {
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : KernelInterrupt::yield()\n");
+    // DEBUG_LOG("DEBUG LOG : KernelInterrupt::yield()\n");
   }
   if (use_usleep) {
     if(std::getenv("MMD_ENABLE_DEBUG")){

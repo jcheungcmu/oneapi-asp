@@ -22,13 +22,18 @@ set_parameter_property AFU_ID_L DEFAULT_VALUE {0xa595918500575509}
 set_parameter_property AFU_ID_L DISPLAY_NAME "AFU ID L"
 set_parameter_property AFU_ID_L AFFECTS_ELABORATION true
  
-add_parameter IOPIPE_SUPPORT BOOLEAN true
-set_parameter_property IOPIPE_SUPPORT DEFAULT_VALUE true
+# add_parameter IOPIPE_SUPPORT BOOLEAN true
+# set_parameter_property IOPIPE_SUPPORT DEFAULT_VALUE true
+# set_parameter_property IOPIPE_SUPPORT DISPLAY_NAME "IO Pipe Support"
+# set_parameter_property IOPIPE_SUPPORT AFFECTS_ELABORATION true
+
+add_parameter IOPIPE_SUPPORT BOOLEAN false
+set_parameter_property IOPIPE_SUPPORT DEFAULT_VALUE false
 set_parameter_property IOPIPE_SUPPORT DISPLAY_NAME "IO Pipe Support"
 set_parameter_property IOPIPE_SUPPORT AFFECTS_ELABORATION true
  
-add_parameter NUMBER_OF_MEMORY_BANKS INTEGER 4
-set_parameter_property NUMBER_OF_MEMORY_BANKS DEFAULT_VALUE 4
+add_parameter NUMBER_OF_MEMORY_BANKS INTEGER 2
+set_parameter_property NUMBER_OF_MEMORY_BANKS DEFAULT_VALUE 2
 set_parameter_property NUMBER_OF_MEMORY_BANKS DISPLAY_NAME "Number of Memory Banks"
 set_parameter_property NUMBER_OF_MEMORY_BANKS AFFECTS_ELABORATION true
 

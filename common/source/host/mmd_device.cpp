@@ -51,7 +51,7 @@ Device::Device(uint64_t obj_id)
   // Note that this constructor is not thread-safe because next_mmd_handle
   // is shared between all class instances
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Constructing Device object\n");
+    DEBUG_LOG("DEBUG LOG : Constructing Device object %lu\n", obj_id);
   }
   mmd_handle = next_mmd_handle;
   if (next_mmd_handle == std::numeric_limits<int>::max())
@@ -92,6 +92,8 @@ Device::Device(uint64_t obj_id)
    *  Using Bus, Device we retrieve from above we enumerate Virtual Function (VF) 
    *  using VFIO filter
    */
+
+
   for(int count = 0; count <= 1; count++) {
     fpgaGetProperties(NULL, &filter);
     fpgaPropertiesSetInterface(filter, filter_list[count]);
@@ -137,6 +139,65 @@ Device::Device(uint64_t obj_id)
     throw std::runtime_error("AFC not found");
   }
 
+  // printf("FME PORT ENUM NUM_MATCHES = %d\n", num_matches);
+
+  // for (i = 0 ; i < num_matches ; ++i) {
+  //   res = fpgaGetProperties(tokens[i], &props);
+  //   if (res != FPGA_OK) {
+  //       printf("Error calling API fpgaGetProperties() : %s\n", fpgaErrStr(res));
+  //       // throw std::runtime_error(std::string("Error calling API fpgaGetProperties() : ") +
+  //       //                          std::string(fpgaErrStr(res)));
+  //   }
+
+  //   uint64_t oid = 0;
+  //   res = fpgaPropertiesGetObjectID(props, &oid);
+  //   if (res != FPGA_OK) {
+  //       printf("Error calling API fpgaPropertiesGetObjectID() : %s\n", fpgaErrStr(res));
+  //       // throw std::runtime_error(std::string("Error calling API fpgaPropertiesGetObjectID() : ") +
+  //       //                          std::string(fpgaErrStr(res)));
+  //   }
+  //   printf("ITERATION[%d] OID %ld OBJ_ID %ld\n", i, oid, obj_id);
+
+  //   // if (oid == obj_id) {
+  //     // We've found our Port..
+  //     port_token = tokens[i];
+  
+  //     printf("JASON BOARD NAME FOUND PORT\n");
+  //     res = fpgaOpen(port_token, &port_handle, 0);
+  //     if (res != FPGA_OK) {
+  //       printf("Error opening Port: %s\n", fpgaErrStr(res));
+  //       // throw std::runtime_error(std::string("Error opening Port: ") +
+  //       //                          std::string(fpgaErrStr(res)));
+  //     }
+
+  //     fpgaPropertiesGetBus(props, &bus);
+  //     fpgaPropertiesGetDevice(props, &device);
+  //     fpgaPropertiesGetFunction(props, &function);
+  //     fpgaPropertiesGetParent(props, &fme_token);
+
+  //     printf("OPENING FME\n");
+  //     fpga_handle fme_handle;
+  //     res = fpgaOpen(fme_token, &fme_handle, 0);
+  //     if (res != FPGA_OK) {
+  //       printf("Error opening FME: %s\n", fpgaErrStr(res));
+  //       // throw std::runtime_error(std::string("Error opening FME: ") +
+  //       //                          std::string(fpgaErrStr(res)));
+  //     }
+
+  //     fpgaClose(port_handle);
+  //     fpgaClose(fme_handle);
+
+  //     // fpgaDestroyProperties(&props);
+
+  //     // break;
+  //   // }
+
+
+
+  //   // fpgaDestroyProperties(&props);
+  // }
+
+
   for (i = 0 ; i < num_matches ; ++i) {
     res = fpgaGetProperties(tokens[i], &props);
     if (res != FPGA_OK) {
@@ -155,6 +216,7 @@ Device::Device(uint64_t obj_id)
       // We've found our Port..
       port_token = tokens[i];
 
+      // printf("JASON BOARD NAME FOUND PORT\n");
       res = fpgaOpen(port_token, &port_handle, 0);
       if (res != FPGA_OK) {
         throw std::runtime_error(std::string("Error opening Port: ") +
@@ -164,20 +226,30 @@ Device::Device(uint64_t obj_id)
       fpgaPropertiesGetBus(props, &bus);
       fpgaPropertiesGetDevice(props, &device);
       fpgaPropertiesGetFunction(props, &function);
-
       fpgaPropertiesGetParent(props, &fme_token);
 
+      // printf("OPENING FME\n");
+      // fpga_handle fme_handle;
+      // res = fpgaOpen(fme_token, &fme_handle, 0);
+
+
       fpgaDestroyProperties(&props);
+
       break;
     }
+
+
 
     fpgaDestroyProperties(&props);
   }
 
+
+
   if (!port_token || !fme_token) {
-      printf("port token : %p \n fme token : %p \n", port_token, fme_token);
+      // printf("port token : %p \n fme token : %p \n", port_token, fme_token);
       throw std::runtime_error(std::string("Couldn't find tokens\n "));
   }
+
 
   for(int count = 0; count <= 1; count++) {
     fpgaGetProperties(NULL, &props);
@@ -185,19 +257,64 @@ Device::Device(uint64_t obj_id)
         throw std::runtime_error(std::string("Error reading properties: ") +
             std::string(fpgaErrStr(res)));
     }
-
+    printf("JASON BOARD NAME : %s has obj_id %lu\n", mmd_dev_name.c_str(), obj_id);
     fpgaPropertiesSetBus(props, bus);
     fpgaPropertiesSetDevice(props, device);
+
+    // printf("BUS %d DEVICE %d\n", bus, device);
+    // fpgaPropertiesSetObjectType(props, FPGA_ACCELERATOR);
+
+
+
+    uint8_t function_1 = 1;
+    uint8_t function_2 = 2;
+
+    if (obj_id == 247463936) { //ofs_ec00000 
+      // printf("setting function1\n");
+      fpgaPropertiesSetFunction(props, function_1);
+    }
+    else if (obj_id == 247463939) { // ofs_ec00003
+      // printf("setting function2\n");
+      fpgaPropertiesSetFunction(props, function_2);
+    }
+
+    // if (obj_id == 246415360) { //ofs_ec00000 
+    //   fpgaPropertiesSetFunction(props, function_1);
+    // }
+    // else if (obj_id == 246415363) { // ofs_ec00003
+    //   fpgaPropertiesSetFunction(props, function_2);
+    // }
+    
+
+
+    fpgaPropertiesGetFunction(props, &function);
+    printf("SETTING FILTER FUNCTION %d %d %d \n", function_1, function_2, function);
+
     fpgaPropertiesSetInterface(props, filter_vfio_list[count]);
 
+
+    fpgaPropertiesGetFunction(props, &function);
+    printf("SETTING FILTER FUNCTION %d %d %d \n", function_1, function_2, function);
+
+
     num_matches = 0;
+
+    // res = fpgaEnumerate(&props, 1, &mmio_token, 10, &num_matches);
+    // printf("jason num_matches = %d\n", num_matches);
+
     res = fpgaEnumerate(&props, 1, &mmio_token, 1, &num_matches);
+
+    fpgaPropertiesSetInterface(props, filter_vfio_list[count]);
+
+    // printf("num_matches: %d\n", num_matches);
+
     if (res != FPGA_OK) {
         throw std::runtime_error(std::string("fpgaEnumerate failed: ") +
                                    std::string(fpgaErrStr(res)));	  
     }
 
     if (num_matches >= 1) {
+      // printf("BREAK\n");
       break;	  
     }
 
@@ -217,10 +334,16 @@ Device::Device(uint64_t obj_id)
     throw std::runtime_error("DFL device not found");
   }
 
+  // printf("\n\n\n JASON port token : %p fme token : %p mmio token : %p \n\n\n", port_token, fme_token, mmio_token);
+
+
   if (mmio_token) {
+
+      // printf("OPENING MMIO_TOKEN\n");
       res = fpgaOpen(mmio_token, &mmio_handle, 0);
+      // res = fpgaOpen(mmio_token, &mmio_handle, FPGA_OPEN_SHARED);
       if (res != FPGA_OK) {
-        throw std::runtime_error(std::string("Couldn't open mmio_token: ") +
+        throw std::runtime_error(std::string("223 Couldn't open mmio_token: ") +
                                  std::string(fpgaErrStr(res)));
       }
   }
@@ -267,10 +390,10 @@ Device::Device(uint64_t obj_id)
   initialize_fme_sysfs();
 
   mpf_handle = nullptr;
-  mmd_dev_name = get_board_name(ASP_NAME, obj_id);
+  
   afu_initialized = true;
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Done constructing Device object\n");
+    DEBUG_LOG("DEBUG LOG : Done constructing Device object %lu\n", obj_id);
   }
 }
 
@@ -699,6 +822,7 @@ Device::~Device() {
  *  it reconnects MPF and re-initializes DMA after programming bitstream
  */ 
 int Device::program_bitstream(uint8_t *data, size_t data_size) {
+  // printf("mmd_device program_bitstream\n");
   if (!afu_initialized) {
    if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
       DEBUG_LOG("DEBUG LOG : FPGA NOT FOUND \n");
@@ -707,31 +831,65 @@ int Device::program_bitstream(uint8_t *data, size_t data_size) {
   }
 
   assert(data);
+  // printf("here1\n");
 
   if (kernel_interrupt_thread) {
     kernel_interrupt_thread->disable_interrupts();
   }
+  // printf("here2\n");
 
   if (mpf_handle) {
     if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
       DEBUG_LOG("DEBUG LOG : Disconnecting MPF before program bitstream, this will also disconnect DMA. \n");
     }
     mpfDisconnect(mpf_handle);
+    printf("mpf disconnected\n");
   }
+  // printf("here3\n");
 
-  find_fpga_target target = {bus, device, function, -1};
+  find_fpga_target target = {bus, device, 0, -1};
+
+  // printf("bus: %d device: %d function: %d\n", bus, device, function);
   fpga_token fpga_dev;
+  // printf("here4\n");
+
   int num_found = find_fpga(target, &fpga_dev);
+  // printf("here5\n");
+
   if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
       DEBUG_LOG("DEBUG LOG : Trying to find FPGA using bus, device, function. \n");
   }
 
   int result;
-  if (num_found == 1) {
+  if (num_found >= 1) {
     if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
       DEBUG_LOG("DEBUG LOG : FPGA found , programming bitstream using program_gbs_bitstream() \n");
     }
-    result = program_gbs_bitstream(fpga_dev, data, data_size);
+    // result = program_gbs_bitstream(fpga_dev, data, data_size);
+
+
+    int slot_num = 0;
+
+    if (fpga_obj_id == 247463936) { //ofs_ec00000 
+      slot_num = 0;
+    }
+    else if (fpga_obj_id == 247463939) { // ofs_ec00003
+      slot_num = 1;
+    }
+
+    // if (fpga_obj_id == 246415360) { //ofs_ec00000 
+    //   slot_num = 0;
+    // }
+    // else if (fpga_obj_id == 246415363) { // ofs_ec00003
+    //   slot_num = 1;
+    // }
+    
+
+    
+
+    // printf("fpga_obj_id %ld slot_num %d\n", fpga_obj_id, slot_num);
+    result = jason_program_gbs_bitstream(slot_num, fpga_dev, data, data_size);
+    result = 0;
   } else {
     LOG_ERR("Error programming FPGA\n");
     if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
@@ -742,6 +900,8 @@ int Device::program_bitstream(uint8_t *data, size_t data_size) {
 
   fpgaDestroyToken(&fpga_dev);
 
+  // start comment here
+  //////////////////////////////////////////////////
   fpga_result res = FPGA_OK;
   fpga_properties prop = nullptr;
 
@@ -763,6 +923,7 @@ int Device::program_bitstream(uint8_t *data, size_t data_size) {
 
   uint32_t num_matches = 0;
   if(!mmio_token){
+    // printf("mmio_token is NULL\n");
     fpgaGetProperties(NULL, &prop);
     fpgaPropertiesSetBus(prop, bus);
     fpgaPropertiesSetDevice(prop, device);
@@ -775,14 +936,15 @@ int Device::program_bitstream(uint8_t *data, size_t data_size) {
                                  std::string(fpgaErrStr(res)));
     }
 
+    // printf("OPENING MMIO_TOKEN\n");
     res = fpgaOpen(mmio_token, &mmio_handle, 0);
     if (res != FPGA_OK) {
-      throw std::runtime_error(std::string("Couldn't open mmio_token: ") +
+      throw std::runtime_error(std::string("780 Couldn't open mmio_token: ") +
                                std::string(fpgaErrStr(res)));
     }
 
   }
-
+  // printf("here6\n");
   res = fpgaGetProperties(mmio_token, &prop);
   if (res != FPGA_OK) {
     throw std::runtime_error(std::string("Error reading properties: ") +
@@ -856,13 +1018,34 @@ int Device::program_bitstream(uint8_t *data, size_t data_size) {
     }
   }
 
+  //////////////////////////////////////////////////
+
+  // printf("INITIALIZING ASP\n");
+  // initialize_asp();
+
+  // if(std::getenv("MMD_ENABLE_DEBUG")){
+  //   DEBUG_LOG("DEBUG LOG : Device::set_status_handler() \n");
+  // }
+  // dma_host_to_fpga->set_status_handler(save_status_fn, save_status_user_data);
+  // dma_fpga_to_host->set_status_handler(save_status_fn, save_status_user_data);
+
+
+  // if (kernel_interrupt_thread) {
+  //   if(std::getenv("MMD_ENABLE_DEBUG")){
+  //     DEBUG_LOG("DEBUG LOG : Device::set_kernel_interrupt() \n");
+  //   }
+  //   kernel_interrupt_thread->set_kernel_interrupt(save_interrupt_fn, save_interrupt_user_data);
+  // }
+
+  //////////////////////////////////////////////////
+
   return result;
 }
 
 /** Calls kernel_interrupt_thread->yield() */
 int Device::yield() {
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Device::yield() \n");
+    // DEBUG_LOG("DEBUG LOG : Device::yield() \n");
   }
   if (kernel_interrupt_thread) {
     return kernel_interrupt_thread->yield();
@@ -889,6 +1072,7 @@ bool Device::asp_loaded() {
     }
     return false;
   }
+
   if (uuid_parse(SVM_ASP_AFU_ID, svm_guid) < 0) {
     LOG_ERR("Error parsing guid '%s'\n", SVM_ASP_AFU_ID);
     if(std::getenv("MMD_ENABLE_DEBUG")){
@@ -922,6 +1106,12 @@ bool Device::asp_loaded() {
     return false;
   }
 
+	char guid_str[37] = {0};
+	uuid_unparse(afu_guid, guid_str);
+
+  // printf("Parsing guid '%s' '%s' '%s' \n", PCI_ASP_AFU_ID, SVM_ASP_AFU_ID, guid_str);
+
+
   fpgaDestroyProperties(&prop);
   if (uuid_compare(pci_guid, afu_guid) == 0 ||
       uuid_compare(svm_guid, afu_guid) == 0) {
@@ -929,11 +1119,13 @@ bool Device::asp_loaded() {
       DEBUG_LOG("DEBUG LOG : asp loaded : true \n");
     } 
     return true;
+    // return false;
   } else {
     if(std::getenv("MMD_ENABLE_DEBUG")){
       DEBUG_LOG("DEBUG LOG : asp loaded : false \n");
     }
     return false;
+    // return true;
   }
 }
 
@@ -965,6 +1157,7 @@ float Device::get_temperature() {
   }
 
   fpga_result res;
+  // printf("GET FME TOKEN\n");
   res = fpgaTokenGetObject(fme_token, name, &obj, FPGA_OBJECT_GLOB);
   if (res != FPGA_OK) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
@@ -990,6 +1183,8 @@ void Device::set_kernel_interrupt(aocl_mmd_interrupt_handler_fn fn,
     DEBUG_LOG("DEBUG LOG : Device::set_kernel_interrupt() \n");
   }
   if (kernel_interrupt_thread) {
+    save_interrupt_fn = fn;
+    save_interrupt_user_data = user_data;
     kernel_interrupt_thread->set_kernel_interrupt(fn, user_data);
   }
 }
@@ -1003,6 +1198,8 @@ void Device::set_status_handler(aocl_mmd_status_handler_fn fn,
   }
   event_update = fn;
   event_update_user_data = user_data;
+  save_status_fn = fn;
+  save_status_user_data = user_data;
   dma_host_to_fpga->set_status_handler(fn, user_data);
   dma_fpga_to_host->set_status_handler(fn, user_data);
 }
@@ -1024,7 +1221,7 @@ void Device::event_update_fn(aocl_mmd_op_t op, int status) {
 int Device::read_block(aocl_mmd_op_t op, int mmd_interface, void *host_addr,
                            size_t offset, size_t size) {
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Device::read_block()\n");
+    // DEBUG_LOG("DEBUG LOG : Device::read_block()\n");
   }
   int res;
 
@@ -1033,14 +1230,14 @@ int Device::read_block(aocl_mmd_op_t op, int mmd_interface, void *host_addr,
   // base address + offset
   if (mmd_interface == AOCL_MMD_MEMORY) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using DMA to read block\n");
+      // DEBUG_LOG("DEBUG LOG : Using DMA to read block\n");
     }
     assert(offset >= ddr_offset);
     res = dma_fpga_to_host->fpga_to_host(op, host_addr, offset - ddr_offset,
                                          size);
   } else {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using MMIO to read block\n");
+      // DEBUG_LOG("DEBUG LOG : Using MMIO to read block\n");
     }
     res = read_mmio(host_addr, mmd_interface + offset, size);
 
@@ -1057,7 +1254,7 @@ int Device::read_block(aocl_mmd_op_t op, int mmd_interface, void *host_addr,
 int Device::write_block(aocl_mmd_op_t op, int mmd_interface,
                             const void *host_addr, size_t offset, size_t size) {
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Device::write_block()\n");
+    // DEBUG_LOG("DEBUG LOG : Device::write_block()\n");
   }
   int res;
 
@@ -1065,14 +1262,14 @@ int Device::write_block(aocl_mmd_op_t op, int mmd_interface,
   // to memory requires special functionality.  Otherwise do direct MMIO write
   if (mmd_interface == AOCL_MMD_MEMORY) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using DMA to write block\n");
+      // DEBUG_LOG("DEBUG LOG : Using DMA to write block\n");
     }
     assert(offset >= ddr_offset);
     res = dma_host_to_fpga->host_to_fpga(op, host_addr, offset - ddr_offset,
                                          size);
   } else {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using MMIO to write block\n");
+      // DEBUG_LOG("DEBUG LOG : Using MMIO to write block\n");
     }
     res = write_mmio(host_addr, mmd_interface + offset, size);
     if (op) {
@@ -1146,7 +1343,7 @@ int Device::read_mmio(void *host_addr, size_t mmio_addr, size_t size) {
   DCP_DEBUG_MEM("read_mmio start: %p\t 0x%zx\t 0x%zx\n", host_addr, mmio_addr,
                 size);
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Device::read_mmio start: host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr, mmio_addr, size );
+    // DEBUG_LOG("DEBUG LOG : Device::read_mmio start: host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr, mmio_addr, size );
   }
 
   // HACK: need extra delay for oneapi sw reset
@@ -1156,7 +1353,7 @@ int Device::read_mmio(void *host_addr, size_t mmio_addr, size_t size) {
   uint64_t *host_addr64 = static_cast<uint64_t *>(host_addr);
   while (size >= 8) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using fpgaReadMMIO64()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x8\n",host_addr,mmio_addr);
+      // DEBUG_LOG("DEBUG LOG : Using fpgaReadMMIO64()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x8\n",host_addr,mmio_addr);
     }
     res = fpgaReadMMIO64(mmio_handle, 0, mmio_addr, host_addr64);
     if (res != FPGA_OK){
@@ -1173,7 +1370,7 @@ int Device::read_mmio(void *host_addr, size_t mmio_addr, size_t size) {
   uint32_t *host_addr32 = reinterpret_cast<uint32_t *>(host_addr64);
   while (size >= 4) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using fpgaReadMMIO32()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x4\n",host_addr,mmio_addr);
+      // DEBUG_LOG("DEBUG LOG : Using fpgaReadMMIO32()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x4\n",host_addr,mmio_addr);
     }
     res = fpgaReadMMIO32(mmio_handle, 0, mmio_addr, host_addr32);
     if (res != FPGA_OK){
@@ -1190,7 +1387,7 @@ int Device::read_mmio(void *host_addr, size_t mmio_addr, size_t size) {
   if (size > 0) {
     uint32_t read_data;
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using fpgaReadMMIO32()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr,mmio_addr,size);
+      // DEBUG_LOG("DEBUG LOG : Using fpgaReadMMIO32()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr,mmio_addr,size);
     }
     res = fpgaReadMMIO32(mmio_handle, 0, mmio_addr, &read_data);
     if (res != FPGA_OK){
@@ -1214,7 +1411,7 @@ int Device::write_mmio(const void *host_addr, size_t mmio_addr,
 
   DEBUG_PRINT("write_mmio\n");
   if(std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : Device::write_mmio start: host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr, mmio_addr, size );
+    // DEBUG_LOG("DEBUG LOG : Device::write_mmio start: host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr, mmio_addr, size );
   }
 
   // HACK: need extra delay for oneapi sw reset
@@ -1224,7 +1421,7 @@ int Device::write_mmio(const void *host_addr, size_t mmio_addr,
   const uint64_t *host_addr64 = static_cast<const uint64_t *>(host_addr);
   while (size >= 8) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using fpgaWriteMMIO64()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x8\n",host_addr,mmio_addr);
+      // DEBUG_LOG("DEBUG LOG : Using fpgaWriteMMIO64()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x8\n",host_addr,mmio_addr);
     }
     res = fpgaWriteMMIO64(mmio_handle, 0, mmio_addr, *host_addr64);
     if (res != FPGA_OK){
@@ -1241,7 +1438,7 @@ int Device::write_mmio(const void *host_addr, size_t mmio_addr,
   const uint32_t *host_addr32 = reinterpret_cast<const uint32_t *>(host_addr64);
   while (size > 0) {
     if(std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Using fpgaWriteMMIO32()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr,mmio_addr,size);
+      // DEBUG_LOG("DEBUG LOG : Using fpgaWriteMMIO32()       host_addr : %p\t mmio_addr : 0x%zx\t size : 0x%zx\n",host_addr,mmio_addr,size);
     }
     uint32_t tmp_data32 = 0;
     size_t chunk_size = (size >= 4) ? 4 : size;

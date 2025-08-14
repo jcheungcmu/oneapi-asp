@@ -59,6 +59,7 @@ void print_msg(unsigned int verbosity, const char *s) {
  * @returns the total number of FPGAs matching the interface ID
  */
 int find_fpga(struct find_fpga_target target, fpga_token *fpga) {
+  printf("enter find_fpga\n");
   fpga_properties filter = NULL;
   uint32_t num_matches;
   fpga_result res;
@@ -91,9 +92,13 @@ int find_fpga(struct find_fpga_target target, fpga_token *fpga) {
     ON_ERR_GOTO(res, out_destroy, "setting socket id");
   }
 
+  printf("bus = %d, device = %d, function = %d, socket = %d\n", target.bus,
+         target.device, target.function, target.socket);
+  printf("fpgaconf fpgaEnumerate\n");
   res = fpgaEnumerate(&filter, 1, fpga, 1, &num_matches);
   ON_ERR_GOTO(res, out_destroy, "enumerating FPGAs");
 
+  printf("num_matches: %d\n", num_matches);
   if (num_matches > 0) {
     retval = (int)num_matches; /* FPGA found */
   } else {
@@ -115,6 +120,7 @@ int program_bitstream(fpga_token token, uint32_t slot_num,
                       struct bitstream_info *info) {
   fpga_handle handle;
   fpga_result res;
+  int flags = 0;
 
   print_msg(2, "Opening FPGA");
   if(getenv("MMD_PROGRAM_DEBUG") || getenv("MMD_ENABLE_DEBUG")){
@@ -127,8 +133,12 @@ int program_bitstream(fpga_token token, uint32_t slot_num,
   if(getenv("MMD_PROGRAM_DEBUG") || getenv("MMD_ENABLE_DEBUG")){
     DEBUG_LOG("DEBUG LOG : Writing bitstream using fpgaReconfigureSlot() \n");
   }
+
+  flags |= FPGA_RECONF_FORCE;
+  flags |= FPGA_RECONF_SKIP_USRCLK;
+
   res = fpgaReconfigureSlot(handle, slot_num, info->data, info->data_len,
-                            FPGA_RECONF_FORCE);
+                            flags);
   ON_ERR_GOTO(res, out_close, "writing bitstream to FPGA");
 
   print_msg(2, "Closing FPGA");
@@ -154,6 +164,36 @@ int program_gbs_bitstream(fpga_token fpga, uint8_t *gbs_data, size_t gbs_len) {
   int retval = 0;
   struct bitstream_info info;
   uint32_t slot_num = 0; /* currently, we don't support multiple slots */
+
+  info.data = gbs_data;
+  info.data_len = gbs_len;
+
+  /* program bitstream */
+  print_msg(1, "Programming bitstream");
+  if(getenv("MMD_PROGRAM_DEBUG") || getenv("MMD_ENABLE_DEBUG")){
+    DEBUG_LOG("DEBUG LOG : Programming bitstream using slot_num = 0, currently, we don't support multiple slots\n");
+  }
+  res = program_bitstream(fpga, slot_num, &info);
+  if (res < 0) {
+    retval = 5;
+    goto out_exit;
+  }
+  print_msg(1, "Done");
+
+  /* clean up */
+out_exit:
+  return retval;
+}
+
+
+/** program_gbs_bitstream() function is used in program_bitstream() function in mmd_device.cpp
+ *  it calls program_bitstream() function in fpgaconf.c
+ */
+int jason_program_gbs_bitstream(int _slot_num, fpga_token fpga, uint8_t *gbs_data, size_t gbs_len) {
+  int res;
+  int retval = 0;
+  struct bitstream_info info;
+  uint32_t slot_num = _slot_num; /* currently, we don't support multiple slots */
 
   info.data = gbs_data;
   info.data_len = gbs_len;

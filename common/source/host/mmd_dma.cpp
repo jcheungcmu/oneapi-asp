@@ -369,10 +369,12 @@ int mmd_dma::send_descriptors(uint64_t dma_src_addr, uint64_t dma_dst_addr, uint
     }
     while (*fpga_write_addr != FPGA_DMA_WF_MAGIC_NO) {
 #if 0
+      // printf("FPGA_WRITE_ADDR: %lx\n", *fpga_write_addr);
       printf("\n");
       read_status_registers();
       sleep(1);
 #endif
+      // printf("FPGA_WRITE_ADDR: %lx\n", *fpga_write_addr);
       std::this_thread::yield();
     }
     if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){

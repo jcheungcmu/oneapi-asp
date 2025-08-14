@@ -148,6 +148,14 @@ public:
   void dump_mpf_stats();
 
 private:
+
+
+  aocl_mmd_status_handler_fn save_status_fn;
+  void *save_status_user_data;
+
+  aocl_mmd_interrupt_handler_fn save_interrupt_fn;
+  void *save_interrupt_user_data;
+
   static int next_mmd_handle;
 
   int mem_capability_support;
