@@ -109,10 +109,10 @@ package ofs_asp_pkg;
         parameter IO_PIPES_NUM_CHAN = `OFS_FIM_IP_CFG_HSSI_SS_NUM_ETH_PORTS/2;
     `else
         // parameter IO_PIPES_NUM_CHAN = 0;
-        parameter IO_PIPES_NUM_CHAN = 1;
+        parameter IO_PIPES_NUM_CHAN = 2;
     `endif
     //Avalon Streaming data width - I/O Pipe connection to kernel-system
     // parameter ASP_ETH_PKT_DATA_WIDTH = ofs_fim_eth_if_pkg::ETH_PACKET_WIDTH;
-    parameter ASP_ETH_PKT_DATA_WIDTH = 64;
+    parameter ASP_ETH_PKT_DATA_WIDTH = 80;
     
 endpackage : ofs_asp_pkg
