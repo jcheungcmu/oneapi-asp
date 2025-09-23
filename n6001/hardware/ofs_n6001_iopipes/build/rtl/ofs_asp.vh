@@ -108,7 +108,7 @@
     // `endif
     
     `define ASP_ENABLE_IOPIPE_0 1
-    // `define ASP_ENABLE_IOPIPE_1 1
+    `define ASP_ENABLE_IOPIPE_1 1
     // `define ASP_ENABLE_IOPIPE_2 1
     // `define ASP_ENABLE_IOPIPE_3 1
     // `define ASP_ENABLE_IOPIPE_4 1

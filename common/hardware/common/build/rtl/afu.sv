@@ -23,8 +23,8 @@ import ofs_asp_pkg::*;
         ofs_plat_hssi_channel_if hssi_pipes[IO_PIPES_NUM_CHAN],
     `endif
 
-    asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
-    asp_avst_if.sink      udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0],
+    asp_avst_if.source    udp_avst_to_other_pg[IO_PIPES_NUM_CHAN-1:0],
+    asp_avst_if.sink      udp_avst_from_other_pg[IO_PIPES_NUM_CHAN-1:0],
 
     // clocks and reset
     input logic pClk,                      //Primary interface clock
@@ -159,6 +159,33 @@ host_mem_if_vtp host_mem_if_vtp_inst (
     );
 `endif
 
+// asp_avst_if udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0]();
+// asp_avst_if udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]();
+
+// genvar ch;
+// generate 
+//     for (ch = 0; ch < IO_PIPES_NUM_CHAN; ch++) begin : tx_rx_inst
+//         jason_simple_tx jason_simple_tx
+//         (
+//             .kernel_clk(uClk_usrDiv2),
+//             .kernel_resetn(kernel_control.kernel_reset_n),
+
+//             .udp_avst_from_kernel(udp_avst_from_kernel[ch]),
+//             .udp_avst_to_other_pg(udp_avst_to_other_pg[ch])
+//         );
+        
+//         // FPGA RX path (Ethernet MAC RX through UDP offload engine to kernel udp_in hostpipe)
+//         jason_simple_rx jason_simple_rx
+//         (
+//             .kernel_clk(uClk_usrDiv2),
+//             .kernel_resetn(kernel_control.kernel_reset_n),
+
+//             .udp_avst_to_kernel(udp_avst_to_kernel[ch]),
+//             .udp_avst_from_other_pg(udp_avst_from_other_pg[ch])
+//         );
+//     end //for
+// endgenerate
+
 
 asp_logic asp_logic_inst (
     .clk                    ( pClk ),
@@ -188,8 +215,8 @@ kernel_wrapper kernel_wrapper_inst (
     `endif
 
     // `ifdef INCLUDE_IO_PIPES
-        ,.udp_avst_from_kernel,
-         .udp_avst_to_kernel
+        ,.udp_avst_from_kernel(udp_avst_to_other_pg),
+         .udp_avst_to_kernel(udp_avst_from_other_pg)
     // `endif
 );
 

@@ -5,23 +5,23 @@
 `include "ofs_plat_if.vh"
 `include "ofs_asp.vh"
 
-interface asp_avst_if #(
-    // parameter DATA_WIDTH        = ofs_fim_eth_if_pkg::ETH_PACKET_WIDTH
-    parameter DATA_WIDTH        = 64
-);
-    logic                           valid;
-    logic                           ready;
-    logic [DATA_WIDTH-1:0]          data;
+// interface asp_avst_if #(
+//     // parameter DATA_WIDTH        = ofs_fim_eth_if_pkg::ETH_PACKET_WIDTH
+//     parameter DATA_WIDTH        = 64
+// );
+//     logic                           valid;
+//     logic                           ready;
+//     logic [DATA_WIDTH-1:0]          data;
     
-    modport source (
-        input  ready,
-        output valid, data
-    );
-    modport sink (
-        input  valid, data,
-        output ready
-    );
-endinterface : asp_avst_if
+//     modport source (
+//         input  ready,
+//         output valid, data
+//     );
+//     modport sink (
+//         input  valid, data,
+//         output ready
+//     );
+// endinterface : asp_avst_if
 
 
 module ofs_plat_afu
@@ -177,8 +177,8 @@ module ofs_plat_afu
         `ifdef INCLUDE_IO_PIPES
             .hssi_pipes(plat_ifc.hssi.channels[0:IO_PIPES_NUM_CHAN-1]),
         `endif
-        .udp_avst_from_kernel,
-        .udp_avst_to_kernel,
+        .udp_avst_to_other_pg(udp_avst_from_kernel),
+        .udp_avst_from_other_pg(udp_avst_to_kernel),
 
         
         .pClk(pclk_asp),
