@@ -12,13 +12,13 @@ set_module_property COMPOSITION_CALLBACK compose
 # +-----------------------------------
 # | parameters
 # |
-add_parameter NUMBER_OF_MEMORY_BANKS INTEGER 4
-set_parameter_property NUMBER_OF_MEMORY_BANKS DEFAULT_VALUE 4
+add_parameter NUMBER_OF_MEMORY_BANKS INTEGER 1
+set_parameter_property NUMBER_OF_MEMORY_BANKS DEFAULT_VALUE 1
 set_parameter_property NUMBER_OF_MEMORY_BANKS DISPLAY_NAME "Number of Memory Banks"
 set_parameter_property NUMBER_OF_MEMORY_BANKS AFFECTS_ELABORATION true
 
-add_parameter MEMORY_BANK_ADDRESS_WIDTH INTEGER 32
-set_parameter_property MEMORY_BANK_ADDRESS_WIDTH DEFAULT_VALUE 32
+add_parameter MEMORY_BANK_ADDRESS_WIDTH INTEGER 33
+set_parameter_property MEMORY_BANK_ADDRESS_WIDTH DEFAULT_VALUE 33
 set_parameter_property MEMORY_BANK_ADDRESS_WIDTH DISPLAY_NAME "Memory Bank Address Width"
 set_parameter_property MEMORY_BANK_ADDRESS_WIDTH AFFECTS_ELABORATION true
 
@@ -233,9 +233,10 @@ proc compose { } {
     add_interface acl_asp_snoop avalon_streaming start 
     set_interface_property acl_asp_snoop EXPORT_OF memory_bank_divider.acl_asp_snoop
   }
-  
-  add_interface acl_asp_memorg_host conduit end
-  set_interface_property acl_asp_memorg_host EXPORT_OF memory_bank_divider.acl_asp_memorg_host
+   
+  # this interface does not exist when num_banks == 1 because it is not defined in memory_bank_divider_hw.tcl
+  # add_interface acl_asp_memorg_host conduit end
+  # set_interface_property acl_asp_memorg_host EXPORT_OF memory_bank_divider.acl_asp_memorg_host
   add_interface dma_localmem_rd avalon slave
   set_interface_property dma_localmem_rd EXPORT_OF dma_localmem_rd_pipe.s0
   add_interface dma_localmem_wr avalon slave

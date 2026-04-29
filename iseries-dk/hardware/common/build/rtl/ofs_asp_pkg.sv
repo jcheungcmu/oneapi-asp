@@ -14,7 +14,8 @@ package ofs_asp_pkg;
     parameter ASP_MMIO_ADDR_WIDTH = ofs_plat_host_chan_pkg::MMIO_ADDR_WIDTH_BYTES;
     parameter ASP_MMIO_QSYS_ADDR_WIDTH = 18;
     
-    parameter ASP_LOCALMEM_NUM_CHANNELS     = local_mem_cfg_pkg::LOCAL_MEM_NUM_BANKS;
+    // parameter ASP_LOCALMEM_NUM_CHANNELS     = local_mem_cfg_pkg::LOCAL_MEM_NUM_BANKS;
+    parameter ASP_LOCALMEM_NUM_CHANNELS     = 1;
     parameter ASP_LOCALMEM_AVMM_DATA_WIDTH  = local_mem_cfg_pkg::LOCAL_MEM_DATA_WIDTH;
     parameter ASP_LOCALMEM_AVMM_ADDR_WIDTH  = local_mem_cfg_pkg::LOCAL_MEM_BYTE_ADDR_WIDTH;
     parameter ASP_LOCALMEM_AVMM_BURSTCNT_WIDTH = local_mem_cfg_pkg::LOCAL_MEM_BURST_CNT_WIDTH;
@@ -107,8 +108,14 @@ package ofs_asp_pkg;
         parameter IO_PIPES_NUM_CHAN = `OFS_FIM_IP_CFG_HSSI_SS_NUM_ETH_PORTS;
     `else
         parameter IO_PIPES_NUM_CHAN = 0;
+        // parameter IO_PIPES_NUM_CHAN = 2;
+        parameter IO_PIPES_NUM_CHAN_DATA = 1;
+        parameter IO_PIPES_NUM_CHAN_CTRL = 1;
     `endif
     //Avalon Streaming data width - I/O Pipe connection to kernel-system
-    parameter ASP_ETH_PKT_DATA_WIDTH = ofs_fim_eth_if_pkg::ETH_PACKET_WIDTH;
+    // parameter ASP_ETH_PKT_DATA_WIDTH = ofs_fim_eth_if_pkg::ETH_PACKET_WIDTH;
+    // parameter ASP_ETH_PKT_DATA_WIDTH = 40;
+    parameter JASON_IOPIPE_DATA_WIDTH = 96;
+    parameter JASON_IOPIPE_CTRL_WIDTH = 32;
     
 endpackage : ofs_asp_pkg

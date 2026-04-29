@@ -516,6 +516,8 @@ int mmd_dma::fpga_to_host(aocl_mmd_op_t op, void *host_addr,
   dma_work_item item = {
       .op = op, .host_addr = host_addr, .dev_addr = dev_addr, .size = size};
 
+  // DEBUG_LOG("\nFPGA_TO_HOST DEBUG LOG : TID : %ld DMA ---- %s TRANSACTION , host_addr = %p, device_addr = %ld, transaction size = 0x%zx\n", transaction_id, op_mode,host_addr, dev_addr, size);
+    
   if(std::getenv("MMD_DMA_DEBUG")){
     DEBUG_LOG("\nDEBUG LOG : TID : %ld DMA ---- %s TRANSACTION , host_addr = %p, device_addr = %ld, transaction size = 0x%zx\n", transaction_id, op_mode,host_addr, dev_addr, size);
   }
@@ -536,6 +538,8 @@ int mmd_dma::host_to_fpga(aocl_mmd_op_t op, const void *host_addr,
                         .host_addr = const_cast<void *>(host_addr),
                         .dev_addr = dev_addr,
                         .size = size};
+  // DEBUG_LOG("\nHOST_TO_FPGA DEBUG LOG : TID : %ld DMA ---- %s TRANSACTION , host_addr = %p, device_addr = %ld, transaction size = 0x%zx\n", transaction_id, op_mode, host_addr, dev_addr, size);
+                        
   if(std::getenv("MMD_DMA_DEBUG")){
     DEBUG_LOG("\nDEBUG LOG : TID : %ld DMA ---- %s TRANSACTION , host_addr = %p, device_addr = %ld, transaction size = 0x%zx\n", transaction_id, op_mode, host_addr, dev_addr, size);
   }

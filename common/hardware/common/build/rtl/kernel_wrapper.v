@@ -23,9 +23,15 @@ import ofs_asp_pkg::*;
         , ofs_plat_avalon_mem_if.to_sink kernel_svm
     `endif
     // `ifdef INCLUDE_IO_PIPES
-        ,asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
-        asp_avst_if.sink       udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]
+        // ,asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
+        // asp_avst_if.sink       udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]
     // `endif
+
+    ,asp_avst_if_data.source    udp_avst_from_kernel_data[IO_PIPES_NUM_CHAN_DATA-1:0],
+    asp_avst_if_data.sink       udp_avst_to_kernel_data[IO_PIPES_NUM_CHAN_DATA-1:0]
+
+    ,asp_avst_if_ctrl.source    udp_avst_from_kernel_ctrl[IO_PIPES_NUM_CHAN_CTRL-1:0],
+    asp_avst_if_ctrl.sink       udp_avst_to_kernel_ctrl[IO_PIPES_NUM_CHAN_CTRL-1:0]
 );
 
 kernel_mem_intf mem_avmm_bridge [ASP_LOCALMEM_NUM_CHANNELS-1:0] ();
@@ -255,20 +261,32 @@ kernel_system kernel_system_inst (
     
     // `ifdef INCLUDE_IO_PIPES
         `ifdef ASP_ENABLE_IOPIPE_0
-            ,.udp_out_valid        (udp_avst_from_kernel[0].valid),
-            .udp_out_data          (udp_avst_from_kernel[0].data),
-            .udp_out_ready         (udp_avst_from_kernel[0].ready),
-            .udp_in_valid          (udp_avst_to_kernel[0].valid),
-            .udp_in_data           (udp_avst_to_kernel[0].data),
-            .udp_in_ready          (udp_avst_to_kernel[0].ready)
+            // ,.udp_out_valid        (udp_avst_from_kernel[0].valid),
+            // .udp_out_data          (udp_avst_from_kernel[0].data),
+            // .udp_out_ready         (udp_avst_from_kernel[0].ready),
+            // .udp_in_valid          (udp_avst_to_kernel[0].valid),
+            // .udp_in_data           (udp_avst_to_kernel[0].data),
+            // .udp_in_ready          (udp_avst_to_kernel[0].ready)
+            ,.udp_out_valid        (udp_avst_from_kernel_data[0].valid),
+            .udp_out_data          (udp_avst_from_kernel_data[0].data),
+            .udp_out_ready         (udp_avst_from_kernel_data[0].ready),
+            .udp_in_valid          (udp_avst_to_kernel_data[0].valid),
+            .udp_in_data           (udp_avst_to_kernel_data[0].data),
+            .udp_in_ready          (udp_avst_to_kernel_data[0].ready)
         `endif //ASP_ENABLE_IOPIPE_0
         `ifdef ASP_ENABLE_IOPIPE_1
-            ,.udp_out_1_valid        (udp_avst_from_kernel[1].valid),
-            .udp_out_1_data          (udp_avst_from_kernel[1].data),
-            .udp_out_1_ready         (udp_avst_from_kernel[1].ready),
-            .udp_in_1_valid          (udp_avst_to_kernel[1].valid),
-            .udp_in_1_data           (udp_avst_to_kernel[1].data),
-            .udp_in_1_ready          (udp_avst_to_kernel[1].ready)
+            // ,.udp_out_1_valid        (udp_avst_from_kernel[1].valid),
+            // .udp_out_1_data          (udp_avst_from_kernel[1].data),
+            // .udp_out_1_ready         (udp_avst_from_kernel[1].ready),
+            // .udp_in_1_valid          (udp_avst_to_kernel[1].valid),
+            // .udp_in_1_data           (udp_avst_to_kernel[1].data),
+            // .udp_in_1_ready          (udp_avst_to_kernel[1].ready)
+            ,.udp_out_1_valid        (udp_avst_from_kernel_ctrl[0].valid),
+            .udp_out_1_data          (udp_avst_from_kernel_ctrl[0].data),
+            .udp_out_1_ready         (udp_avst_from_kernel_ctrl[0].ready),
+            .udp_in_1_valid          (udp_avst_to_kernel_ctrl[0].valid),
+            .udp_in_1_data           (udp_avst_to_kernel_ctrl[0].data),
+            .udp_in_1_ready          (udp_avst_to_kernel_ctrl[0].ready)
         `endif //ASP_ENABLE_IOPIPE_1
         `ifdef ASP_ENABLE_IOPIPE_2
             ,.udp_out_2_valid        (udp_avst_from_kernel[2].valid),

@@ -23,9 +23,14 @@ import ofs_asp_pkg::*;
         ofs_plat_hssi_channel_if hssi_pipes[IO_PIPES_NUM_CHAN],
     `endif
 
-    asp_avst_if.source    udp_avst_to_other_pg[IO_PIPES_NUM_CHAN-1:0],
-    asp_avst_if.sink      udp_avst_from_other_pg[IO_PIPES_NUM_CHAN-1:0],
+    // asp_avst_if.source    udp_avst_to_other_pg[IO_PIPES_NUM_CHAN-1:0],
+    // asp_avst_if.sink      udp_avst_from_other_pg[IO_PIPES_NUM_CHAN-1:0],
 
+    asp_avst_if_data.source    udp_avst_to_other_pg_data[IO_PIPES_NUM_CHAN_DATA-1:0],
+    asp_avst_if_data.sink      udp_avst_from_other_pg_data[IO_PIPES_NUM_CHAN_DATA-1:0],
+
+    asp_avst_if_ctrl.source    udp_avst_to_other_pg_ctrl[IO_PIPES_NUM_CHAN_CTRL-1:0],
+    asp_avst_if_ctrl.sink      udp_avst_from_other_pg_ctrl[IO_PIPES_NUM_CHAN_CTRL-1:0],
     // clocks and reset
     input logic pClk,                      //Primary interface clock
     input logic pClk_reset,                // ACTIVE HIGH Soft Reset
@@ -215,8 +220,13 @@ kernel_wrapper kernel_wrapper_inst (
     `endif
 
     // `ifdef INCLUDE_IO_PIPES
-        ,.udp_avst_from_kernel(udp_avst_to_other_pg),
-         .udp_avst_to_kernel(udp_avst_from_other_pg)
+        // ,.udp_avst_from_kernel(udp_avst_to_other_pg),
+        //  .udp_avst_to_kernel(udp_avst_from_other_pg)
+        ,.udp_avst_from_kernel_data(udp_avst_to_other_pg_data),
+         .udp_avst_to_kernel_data(udp_avst_from_other_pg_data)
+        ,.udp_avst_from_kernel_ctrl(udp_avst_to_other_pg_ctrl),
+         .udp_avst_to_kernel_ctrl(udp_avst_from_other_pg_ctrl)
+
     // `endif
 );
 

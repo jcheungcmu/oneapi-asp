@@ -27,8 +27,8 @@ set_parameter_property IOPIPE_SUPPORT DEFAULT_VALUE false
 set_parameter_property IOPIPE_SUPPORT DISPLAY_NAME "IO Pipe Support"
 set_parameter_property IOPIPE_SUPPORT AFFECTS_ELABORATION true
  
-add_parameter NUMBER_OF_MEMORY_BANKS INTEGER 4
-set_parameter_property NUMBER_OF_MEMORY_BANKS DEFAULT_VALUE 4
+add_parameter NUMBER_OF_MEMORY_BANKS INTEGER 1
+set_parameter_property NUMBER_OF_MEMORY_BANKS DEFAULT_VALUE 1
 set_parameter_property NUMBER_OF_MEMORY_BANKS DISPLAY_NAME "Number of Memory Banks"
 set_parameter_property NUMBER_OF_MEMORY_BANKS AFFECTS_ELABORATION true
 
@@ -212,7 +212,8 @@ proc compose { } {
   add_connection board_irq_ctrl.interrupt_receiver kernel_interface.kernel_irq_to_host irq
 
   # Conduits
-  add_connection kernel_interface.acl_asp_memorg_host0x018 ddr_board.acl_asp_memorg_host conduit
+  # this interface does not exist when num_banks == 1 because it is not defined in ddr_board_hw.tcl and memory_bank_divider_hw.tcl
+  # add_connection kernel_interface.acl_asp_memorg_host0x018 ddr_board.acl_asp_memorg_host conduit
 
   # Data
   add_connection pipe_stage_host_ctrl.m0 pipe_stage_dma_csr.s0 avalon

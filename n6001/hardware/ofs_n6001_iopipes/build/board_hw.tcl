@@ -217,7 +217,7 @@ proc compose { } {
   add_connection board_irq_ctrl.interrupt_receiver kernel_interface.kernel_irq_to_host irq
 
   # Conduits
-  # this interface does not exist when num_banks == 1
+  # this interface does not exist when num_banks == 1 because it is not defined in ddr_board_hw.tcl and memory_bank_divider_hw.tcl
   # add_connection kernel_interface.acl_asp_memorg_host0x018 ddr_board.acl_asp_memorg_host conduit
 
   # Data

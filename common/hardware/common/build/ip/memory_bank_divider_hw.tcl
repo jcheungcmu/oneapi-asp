@@ -16,8 +16,8 @@ set_module_property COMPOSITION_CALLBACK compose
 # +-----------------------------------
 # | parameters
 # | 
-add_parameter NUM_BANKS INTEGER 2
-set_parameter_property NUM_BANKS DEFAULT_VALUE 2
+add_parameter NUM_BANKS INTEGER 1
+set_parameter_property NUM_BANKS DEFAULT_VALUE 1
 set_parameter_property NUM_BANKS ALLOWED_RANGES {1 2 4 8}
 set_parameter_property NUM_BANKS DISPLAY_NAME "Number of banks"
 set_parameter_property NUM_BANKS AFFECTS_ELABORATION true

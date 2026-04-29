@@ -19,7 +19,7 @@
 
 #include "fpgaconf.h"
 
-#define FPGACONF_VERBOSITY 0
+#define FPGACONF_VERBOSITY 2
 
 /*
  * macro to check FPGA return codes, print error message, and goto cleanup label

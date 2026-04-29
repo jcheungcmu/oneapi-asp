@@ -950,10 +950,10 @@ AOCL_MMD_CALL int aocl_mmd_program(int handle, void *user_data, size_t size,
  * NOTE: yield may be called continuously as long as it reports that it has useful work
  */
 int AOCL_MMD_CALL aocl_mmd_yield(int handle) {
-  DEBUG_PRINT("* Called: aocl_mmd_yield\n");
-  if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : * Called: aocl_mmd_yield\n");
-  }
+  // DEBUG_PRINT("* Called: aocl_mmd_yield\n");
+  // if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
+  //   DEBUG_LOG("DEBUG LOG : * Called: aocl_mmd_yield\n");
+  // }
   Device *dev = device_manager.device_from_handle(handle);
   if (dev) {
     return dev->yield();
@@ -1285,18 +1285,18 @@ int AOCL_MMD_CALL aocl_mmd_set_status_handler(int handle,
 int AOCL_MMD_CALL aocl_mmd_write(int handle, aocl_mmd_op_t op, size_t len,
                                  const void *src, int mmd_interface,
                                  size_t offset) {
-  DCP_DEBUG_MEM("\n- aocl_mmd_write: %d\t %p\t %lu\t %p\t %d\t %lu\n", handle,
-                op, len, src, mmd_interface, offset);
-  if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : aocl_mmd_write: handle : %d\t operation : %p\t len : 0x%zx\t src : %p\t mmd_interface : %d\t offset : 0x%zx\n", handle,op, len, src, mmd_interface, offset );
-  }
+  // DCP_DEBUG_MEM("\n- aocl_mmd_write: %d\t %p\t %lu\t %p\t %d\t %lu\n", handle,
+  //               op, len, src, mmd_interface, offset);
+  // if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
+  //   DEBUG_LOG("DEBUG LOG : aocl_mmd_write: handle : %d\t operation : %p\t len : 0x%zx\t src : %p\t mmd_interface : %d\t offset : 0x%zx\n", handle,op, len, src, mmd_interface, offset );
+  // }
   Device *dev = device_manager.device_from_handle(handle);
   if (dev)
     return dev->write_block(op, mmd_interface, src, offset, len);
   else {
-    if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Error in aocl_mmd_write , device not found for handle : %d\n", handle);
-    }
+    // if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
+    //   DEBUG_LOG("DEBUG LOG : Error in aocl_mmd_write , device not found for handle : %d\n", handle);
+    // }
     return -1;
   }
 }
@@ -1332,18 +1332,18 @@ int AOCL_MMD_CALL aocl_mmd_write(int handle, aocl_mmd_op_t op, size_t len,
  */
 int AOCL_MMD_CALL aocl_mmd_read(int handle, aocl_mmd_op_t op, size_t len,
                                 void *dst, int mmd_interface, size_t offset) {
-  DCP_DEBUG_MEM("\n+ aocl_mmd_read: %d\t %p\t %lu\t %p\t %d\t %lu\n", handle,
-                op, len, dst, mmd_interface, offset);
-  if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
-    DEBUG_LOG("DEBUG LOG : aocl_mmd_read: handle : %d\t operation : %p\t len : 0x%zx\t dst : %p\t mmd_interface : %d\t offset : 0x%zx\n", handle,op, len, dst, mmd_interface, offset );
-  }
+  // DCP_DEBUG_MEM("\n+ aocl_mmd_read: %d\t %p\t %lu\t %p\t %d\t %lu\n", handle,
+  //               op, len, dst, mmd_interface, offset);
+  // if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
+  //   DEBUG_LOG("DEBUG LOG : aocl_mmd_read: handle : %d\t operation : %p\t len : 0x%zx\t dst : %p\t mmd_interface : %d\t offset : 0x%zx\n", handle,op, len, dst, mmd_interface, offset );
+  // }
   Device *dev = device_manager.device_from_handle(handle);
   if (dev)
     return dev->read_block(op, mmd_interface, dst, offset, len);
   else {
-    if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
-      DEBUG_LOG("DEBUG LOG : Error in aocl_mmd_read , device not found for handle : %d\n", handle);
-    }
+    // if(std::getenv("MMD_PROGRAM_DEBUG") || std::getenv("MMD_DMA_DEBUG") || std::getenv("MMD_ENABLE_DEBUG")){
+    //   DEBUG_LOG("DEBUG LOG : Error in aocl_mmd_read , device not found for handle : %d\n", handle);
+    // }
     return -1;
   }
 }

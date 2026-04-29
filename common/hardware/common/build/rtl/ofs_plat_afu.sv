@@ -29,8 +29,14 @@ module ofs_plat_afu
     // All platform wires, wrapped in one interface.
     ofs_plat_if plat_ifc,
     
-    asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
-    asp_avst_if.sink      udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]
+    // asp_avst_if.source    udp_avst_from_kernel[IO_PIPES_NUM_CHAN-1:0],
+    // asp_avst_if.sink      udp_avst_to_kernel[IO_PIPES_NUM_CHAN-1:0]
+
+    asp_avst_if_data.source    udp_avst_from_kernel_data[IO_PIPES_NUM_CHAN_DATA-1:0],
+    asp_avst_if_data.sink       udp_avst_to_kernel_data[IO_PIPES_NUM_CHAN_DATA-1:0],
+
+    asp_avst_if_ctrl.source    udp_avst_from_kernel_ctrl[IO_PIPES_NUM_CHAN_CTRL-1:0],
+    asp_avst_if_ctrl.sink       udp_avst_to_kernel_ctrl[IO_PIPES_NUM_CHAN_CTRL-1:0]
     );
     
     import cci_mpf_shim_pkg::t_cci_mpf_shim_mdata_value;
@@ -177,8 +183,10 @@ module ofs_plat_afu
         `ifdef INCLUDE_IO_PIPES
             .hssi_pipes(plat_ifc.hssi.channels[0:IO_PIPES_NUM_CHAN-1]),
         `endif
-        .udp_avst_to_other_pg(udp_avst_from_kernel),
-        .udp_avst_from_other_pg(udp_avst_to_kernel),
+        .udp_avst_to_other_pg_data(udp_avst_from_kernel_data),
+        .udp_avst_from_other_pg_data(udp_avst_to_kernel_data),
+        .udp_avst_to_other_pg_ctrl(udp_avst_from_kernel_ctrl),
+        .udp_avst_from_other_pg_ctrl(udp_avst_to_kernel_ctrl),
 
         
         .pClk(pclk_asp),

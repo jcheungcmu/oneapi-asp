@@ -268,14 +268,28 @@ Device::Device(uint64_t obj_id)
 
     uint8_t function_1 = 1;
     uint8_t function_2 = 2;
+    uint8_t function_3 = 3;
+    uint8_t function_4 = 4;
 
-    if (obj_id == 247463936) { //ofs_ec00000 
+    if (obj_id == 246415370 || obj_id == 247463946) { //ofs_ec0000a 
       // printf("setting function1\n");
       fpgaPropertiesSetFunction(props, function_1);
+      // fpgaPropertiesSetFunction(props, function_3);
     }
-    else if (obj_id == 247463939) { // ofs_ec00003
+    else if (obj_id == 246415375 || obj_id == 247463951) { // ofs_ec0000f
       // printf("setting function2\n");
       fpgaPropertiesSetFunction(props, function_2);
+      // fpgaPropertiesSetFunction(props, function_1);
+    }
+    else if (obj_id == 246415360 || obj_id == 247463936) { // ofs_ec00000
+      // printf("setting function3\n");
+      fpgaPropertiesSetFunction(props, function_3);
+      // fpgaPropertiesSetFunction(props, function_4);
+    }
+    else if (obj_id == 246415365 || obj_id == 247463941) { // ofs_ec00005
+      // printf("setting function 0\n");
+      fpgaPropertiesSetFunction(props, function_4);
+      // fpgaPropertiesSetFunction(props, function_2);
     }
 
     // if (obj_id == 246415360) { //ofs_ec00000 
@@ -288,13 +302,13 @@ Device::Device(uint64_t obj_id)
 
 
     fpgaPropertiesGetFunction(props, &function);
-    printf("SETTING FILTER FUNCTION %d %d %d \n", function_1, function_2, function);
+    printf("SETTING FILTER FUNCTION %d %d %d %d %d \n", function_1, function_2, function_3, function_4, function);
 
     fpgaPropertiesSetInterface(props, filter_vfio_list[count]);
 
 
     fpgaPropertiesGetFunction(props, &function);
-    printf("SETTING FILTER FUNCTION %d %d %d \n", function_1, function_2, function);
+    printf("SETTING FILTER FUNCTION %d %d %d %d %d \n", function_1, function_2, function_3, function_4, function);
 
 
     num_matches = 0;
@@ -644,6 +658,8 @@ bool Device::initialize_asp() {
    ** so setup_oneapi_asp() call can use it to initialize the config, status CSRs for all the pipes.
    */
   bool iopipes_enabled = find_iopipes_dfh_offsets();
+
+  std::cout << "iopipes_enabled = " << iopipes_enabled << std::endl;
   if(!diagnose && iopipes_enabled) {
     DEBUG_LOG("DEBUG LOG : IO Pipes are enabled\n");
     std::string local_ip_address;
@@ -711,10 +727,10 @@ bool Device::initialize_asp() {
   }
   
   //set the magic-number memory location on the host
-  //dma_h->magic_iova
-  //res = MMIOWrite64Blk(dma_h, dma_h->dma_desc_base, (uint64_t)desc,
+  // dma_h->magic_iova
+  // res = MMIOWrite64Blk(dma_h, dma_h->dma_desc_base, (uint64_t)desc,
   //                     sizeof(*desc));
-  //ON_ERR_GOTO(res, out, "MMIOWrite64Blk");
+  // ON_ERR_GOTO(res, out, "MMIOWrite64Blk");
 
   // Turn off membind restriction in order to allow future allocation to
   // occur on different NUMA nodes if needed.  Hypothesis is that only
@@ -870,13 +886,18 @@ int Device::program_bitstream(uint8_t *data, size_t data_size) {
 
     int slot_num = 0;
 
-    if (fpga_obj_id == 247463936) { //ofs_ec00000 
+    if (function == 1) { //ofs_ec00000 
       slot_num = 0;
     }
-    else if (fpga_obj_id == 247463939) { // ofs_ec00003
+    else if (function == 2) { // ofs_ec00003
       slot_num = 1;
     }
-
+    else if (function == 3) { // ofs_ec00004
+      slot_num = 2;
+    }
+    else if (function == 4) { // ofs_ec00003
+      slot_num = 3;
+    }
     // if (fpga_obj_id == 246415360) { //ofs_ec00000 
     //   slot_num = 0;
     // }
